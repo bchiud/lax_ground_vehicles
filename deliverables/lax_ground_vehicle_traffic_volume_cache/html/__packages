@@ -1,0 +1,11 @@
+base
+data.table
+dplyr
+zoo
+timeDate
+forecast
+ggplot2
+knitr
+lubridate
+stringr
+tidyr

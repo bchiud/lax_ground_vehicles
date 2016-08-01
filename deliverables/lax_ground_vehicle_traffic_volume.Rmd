@@ -1,0 +1,114 @@
+---
+title: "Project Template"
+author: "Brady Chiu"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 4
+    number_sections: true
+    css: ./formatting.css
+  pdf_document:
+    toc: true
+    toc_depth: 4
+    number_sections: true
+---
+
+# TL;DR
+
+```{r message=FALSE, warning=FALSE, cache=FALSE, echo=FALSE}
+knitr::read_chunk("../code/main.R")
+knitr::opts_chunk$set(fig.height=5, fig.width=8)
+```
+```{r setup, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```
+```{r functions, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```
+```{r parameters, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```
+```{r data, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```
+```{r data_sanity_check_1, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```
+```{r data_sanity_check_2, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```
+```{r data_sanity_check_3, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```
+```{r data_sanity_check_4, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```
+```{r data_sanity_check_5, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```
+
+# Exploring Patterns
+
+
+
+# Data Quality Check
+
+```{r data_sanity_check_1, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+We see three odd things about our data, and will do what we can to fix them:
+
+1.  Month of 2014-04 has an unusual spike in trip volume
+2.  Month of 2014-09 is the only month where entries out pace exists
+3.  Exits outpace entries every month
+
+## Part 1
+
+Month of 2014-04 has an unusual spike in trip volume.
+
+```{r data_sanity_check_2, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+Investigating our raw data shows dup rows for this month, so we'll go ahead and dedup rows for that month.
+
+```{r data_sanity_check_3, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+## Part 2
+
+We see month of 2014-09 is the only month where entries out pace exists.
+
+We'll correct for this by editing exits for that month to be the "# of entries in 2014-09" + "average difference between exits and entries".
+
+```{r data_sanity_check_4, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+## Part 3
+
+Lastly, exits outpace entries every month. In reality, a vehicle that exits had to have entered at some point, and vice versa. 
+
+For our analysis, we only need one number per month, so we'll use the maximum of each months entry or exit.
+
+```{r data_sanity_check_5, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+## Data Setup
+
+To setup our data, we'll take the last 6 weeks and set them aside for validation. We'll use the remaining data to train our models.
+
+```{r data_setup, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+# Code
+```{r setup, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r functions, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r parameters, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r data, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r data_sanity_check_1, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r data_sanity_check_2, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r data_sanity_check_3, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r data_sanity_check_4, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r data_sanity_check_5, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r data_setup, message=FALSE, warning=FALSE, eval=FALSE}
+```
