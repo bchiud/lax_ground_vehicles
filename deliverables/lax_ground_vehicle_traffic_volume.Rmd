@@ -1,7 +1,7 @@
 ---
 title: "Project Template"
 author: "Brady Chiu"
-date: "`r format(Sys.time(), '%d %B, %Y')`"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
 output: 
   html_document:
     toc: true
@@ -145,6 +145,7 @@ We'll run forecasting using our three models:
 ## Model Comparison
 
 We compared our models using the following error metrics:  
+
 * Mean Absolute Error  
 * Mean Absolute Percentage Error  
 * Mean Squared Error    
