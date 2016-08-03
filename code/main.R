@@ -164,6 +164,10 @@ lax_vehicles %>%
                      breaks=seq(-1000000,1000000,250000),
                      labels=format(seq(-1000000,1000000,250000), big.mark=",", scientific=F))
 
+lax.ts12<-ts(lax.training$vehicles, frequency=12, start=c(year(min(lax.training$reporting_month)),
+                                                          month(min(lax.training$reporting_month))))
+lax.ts12
+
 ## @knitr exploring_patterns
 lax.training %>%
   mutate(month=factor(format(reporting_month ,"%b"), level=c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))) %>%
@@ -181,7 +185,7 @@ lax.training %>%
   mutate(diff1=vehicles-dplyr::lag(vehicles, 1)) %>%
   ggplot(aes(x=reporting_month, y=diff1))+
   geom_line(size=1)+
-  ggtitle("Month-to-Month Change")+
+  ggtitle("LAX Ground Vehicles - I(1)")+
   scale_x_datetime(name="Reporting Month")+
   scale_y_continuous(name="Vehicles",
                      breaks=seq(-1000000,1000000,250000),
@@ -191,11 +195,17 @@ lax.training %>%
 acf(diff(lax.training$vehicles),
      lag.max=sum(!is.na(lax.training$vehicles)))
 
+## @knitr ljung-box
+# http://www.statosphere.com.au/check-time-series-stationary-r/
+Box.test(diff(lax.training$vehicles),
+         lag=20,
+         type="Ljung-Box")
+
 ## @knitr adf
 adf.test(diff(lax.training$vehicles), alternative="stationary")
 
-lax.ts12<-ts(lax.training$vehicles, frequency=12, start=c(year(min(lax.training$reporting_month)),
-                                                                   month(min(lax.training$reporting_month))))
+## @knitr kpss
+kpss.test(diff(lax.training$vehicles))
 
 ## @knitr stl_analysis
 lax.stl<-stl(lax.ts12, s.window="periodic", t.window = 24)
@@ -210,18 +220,7 @@ lax.training %>%
   filter(metric!="actuals") %>%
   ggplot(aes(x=reporting_month, y=value, color=metric, group=metric))+
   geom_line(size=1)+
-  scale_x_datetime(name="Reporting Month",
-                   date_minor_breaks="2 months")+
-  scale_y_continuous(name="Vehicles",
-                     breaks=seq(0,10000000,500000),
-                     labels=format(seq(0,10000000,500000), big.mark=",", scientific=F))
-
-lax.training %>%
-  mutate("Seasonal + Trend"=lax.stl$time.series[,1]+lax.stl$time.series[,2]) %>%
-  dplyr::rename(Actuals=vehicles) %>%
-  gather(metric, value, Actuals:`Seasonal + Trend`) %>%
-  ggplot(aes(x=reporting_month, y=value, color=metric, group=metric))+
-  geom_line(size=1)+
+  ggtitle("STL Decomposition")+
   scale_x_datetime(name="Reporting Month",
                    date_minor_breaks="2 months")+
   scale_y_continuous(name="Vehicles",
@@ -229,7 +228,23 @@ lax.training %>%
                      labels=format(seq(0,10000000,500000), big.mark=",", scientific=F))
 
 ## @knitr stl_validation
+lax.training %>%
+  mutate("Seasonal + Trend"=lax.stl$time.series[,1]+lax.stl$time.series[,2]) %>%
+  dplyr::rename(Actuals=vehicles) %>%
+  gather(metric, value, Actuals:`Seasonal + Trend`) %>%
+  ggplot(aes(x=reporting_month, y=value, color=metric, group=metric))+
+  geom_line(size=1)+
+  ggtitle("STL Decomposition vs. Actuals")+
+  scale_x_datetime(name="Reporting Month",
+                   date_minor_breaks="2 months")+
+  scale_y_continuous(name="Vehicles",
+                     breaks=seq(0,10000000,500000),
+                     labels=format(seq(0,10000000,500000), big.mark=",", scientific=F))
+
 lax.stl.fcast<-data.frame(forecast.stl(lax.stl, h=validation_periods, method="ets"))
+lax.stl.fcast %>%
+  get_table()
+
 lax.stl.predict<-lax.test %>%
   dplyr::rename(actuals=vehicles) %>%
   mutate(predicted=lax.stl.fcast$Point.Forecast)
@@ -243,7 +258,7 @@ lax.training %>%
              color=factor(metric,
                           levels=c("predicted", "actuals"))))+
   geom_line(size=1)+
-  ggtitle("STL Validation")+
+  ggtitle("STL Decomposition Validation")+
   scale_x_datetime(name="Reporting Month",
                    date_minor_breaks="2 months")+
   scale_y_continuous(name="Vehicles",
@@ -251,24 +266,31 @@ lax.training %>%
                      labels=format(seq(0,10000000,500000), big.mark=",", scientific=F))+
   scale_color_hue(name="")
 
-forecast_validation<-data.frame(model="STL",
-                                mae=get_mae(lax.stl.predict$actuals, lax.stl.predict$predicted),
-                                mape=get_mape(lax.stl.predict$actuals, lax.stl.predict$predicted),
-                                mse=get_mse(lax.stl.predict$actuals, lax.stl.predict$predicted),
-                                mpe=get_mpe(lax.stl.predict$actuals, lax.stl.predict$predicted),
-                                stringsAsFactors=F)
-forecast_validation %>%
-  get_table()
+stl_validation<-data.frame(model="STL",
+                           mae=get_mae(lax.stl.predict$actuals, lax.stl.predict$predicted),
+                           mape=get_mape(lax.stl.predict$actuals, lax.stl.predict$predicted),
+                           mse=get_mse(lax.stl.predict$actuals, lax.stl.predict$predicted),
+                           mpe=get_mpe(lax.stl.predict$actuals, lax.stl.predict$predicted),
+                           stringsAsFactors=F)
+stl_validation %>%
+  get_table(4)
+
+forecast_validation<-stl_validation
 
 ## @knitr hw_analysis
 # lax.hw<-HoltWinters(lax.ts12, gamma=F) # trend only
 lax.hw<-HoltWinters(lax.ts12) # seasonal + trend
+lax.hw
+
+## @knitr hw_validation
 lax.hw.fcast<-data.frame(forecast.HoltWinters(lax.hw, h=validation_periods))
+lax.hw.fcast %>%
+  get_table()
+
 lax.hw.predict<-lax.test %>%
   dplyr::rename(actuals=vehicles) %>%
   mutate(predicted=lax.hw.fcast$Point.Forecast)
 
-## @knitr hw_validation
 lax.training %>%
   dplyr::rename(actuals=vehicles) %>%
   gather(metric, value, -reporting_month) %>%
@@ -286,25 +308,30 @@ lax.training %>%
                      labels=format(seq(0,10000000,500000), big.mark=",", scientific=F))+
   scale_color_hue(name="")
 
+hw_validation<-data.frame(model="Holt-Winters",
+                          mae=get_mae(lax.hw.predict$actuals, lax.hw.predict$predicted),
+                          mape=get_mape(lax.hw.predict$actuals, lax.hw.predict$predicted),
+                          mse=get_mse(lax.hw.predict$actuals, lax.hw.predict$predicted),
+                          mpe=get_mpe(lax.hw.predict$actuals, lax.hw.predict$predicted))
+hw_validation %>%
+  get_table(4)
+
 forecast_validation<-forecast_validation %>%
-  bind_rows(data.frame(model="Holt-Winters",
-                       mae=get_mae(lax.hw.predict$actuals, lax.hw.predict$predicted),
-                       mape=get_mape(lax.hw.predict$actuals, lax.hw.predict$predicted),
-                       mse=get_mse(lax.hw.predict$actuals, lax.hw.predict$predicted),
-                       mpe=get_mpe(lax.hw.predict$actuals, lax.hw.predict$predicted)))
-forecast_validation %>%
-  get_table()
+  bind_rows(hw_validation)
 
-
-## @knitr auto_arima_analysis
+## @knitr arima_analysis
 lax.autoarima<-auto.arima(lax.ts12, allowdrift=F)
 lax.autoarima
+
+## @knitr arima_validation
 lax.autoarima.fcast<-data.frame(forecast(lax.autoarima, h=validation_periods))
+lax.autoarima.fcast %>%
+  get_table()
+
 lax.autoarima.predict<-lax.test %>%
   dplyr::rename(actuals=vehicles) %>%
   mutate(predicted=lax.autoarima.fcast$Point.Forecast)
 
-## @knitr auto_arima_validation
 lax.training %>%
   dplyr::rename(actuals=vehicles) %>%
   gather(metric, value, -reporting_month) %>%
@@ -322,26 +349,51 @@ lax.training %>%
                      labels=format(seq(0,10000000,500000), big.mark=",", scientific=F))+
   scale_color_hue(name="")
 
+arima_validation<-data.frame(model="Arima",
+                             mae=get_mae(lax.autoarima.predict$actuals, lax.autoarima.predict$predicted),
+                             mape=get_mape(lax.autoarima.predict$actuals, lax.autoarima.predict$predicted),
+                             mse=get_mse(lax.autoarima.predict$actuals, lax.autoarima.predict$predicted),
+                             mpe=get_mpe(lax.autoarima.predict$actuals, lax.autoarima.predict$predicted))
+
+arima_validation %>%
+  get_table(4)
+
 forecast_validation<-forecast_validation %>%
-  bind_rows(data.frame(model="Auto-Arima",
-                       mae=get_mae(lax.autoarima.predict$actuals, lax.autoarima.predict$predicted),
-                       mape=get_mape(lax.autoarima.predict$actuals, lax.autoarima.predict$predicted),
-                       mse=get_mse(lax.autoarima.predict$actuals, lax.autoarima.predict$predicted),
-                       mpe=get_mpe(lax.autoarima.predict$actuals, lax.autoarima.predict$predicted)))
+  bind_rows(arima_validation)
+
+## @knitr final_forecast
 forecast_validation %>%
   get_table()
 
-## @knitr manual_arima_analysis
-# ARIMA(0,1,1)(0,1,0)[12]
-tsdisplay(diff(lax.training$vehicles))
-tsdisplay(diff(lax.training$vehicles, 12))
-
-fit1 <- arima(ts(lax.training$vehicles, frequency=1), order=c(0,1,1), seasonal=c(1,1,0))
+lax.fcast<-data.frame(forecast.stl(lax.stl, h=24+validation_periods, method="ets"))
+lax.fcast %>%
+  get_table()
 
 
-fit1
-tsdisplay(residuals(fit1), main="Residuals from fitted ARIMA(0,0,1)(0,1,1) model for trips data")
+lax_forecasted<-data.frame(reporting_month=strptime(gsub(" ", "-", paste("01", row.names(lax.fcast), sep="-")), format="%d-%b-%Y"),
+                              metric="predicted",
+                              value=lax.fcast$Point.Forecast)
+lax_forecasted %>%
+  dplyr::select(-metric) %>%
+  get_table()
 
+lax_forecasted %>%
+  filter(year(reporting_month)=="2017") %>%
+  group_by(year(reporting_month)) %>%
+  summarize(vehicles=sum(value))
 
-## @knitr manual_arima_validation
-
+lax_ground_vehicle_traffic_volume_cleaned %>%
+  dplyr::rename(actuals=vehicles) %>%
+  gather(metric, value, -reporting_month) %>%
+  bind_rows(lax_forecasted) %>%
+  ggplot(aes(x=reporting_month, y=value,
+             color=factor(metric,
+                          levels=c("predicted", "actuals"))))+
+  geom_line(size=1)+
+  ggtitle("LAX Ground Vehicle Forecast")+
+  scale_x_datetime(name="Reporting Month",
+                   date_minor_breaks="2 months")+
+  scale_y_continuous(name="Vehicles",
+                     breaks=seq(0,10000000,500000),
+                     labels=format(seq(0,10000000,500000), big.mark=",", scientific=F))+
+  scale_color_hue(name="")
