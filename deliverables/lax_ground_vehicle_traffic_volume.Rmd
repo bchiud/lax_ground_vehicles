@@ -18,7 +18,7 @@ output:
 
 * __Objective:__ Forecast LAX ground vehicle traffic volume for the year of 2017
 * __Apporach:__ We assessed 3 forecasting models: STL Decomposition, Holt-Winters Exponential Smoothing, and Arima  
-* __Finding:__ STL Decomposition performed the best, predicting ~40MM vehicles will pass through LAX in 2017
+* __Finding:__ STL Decomposition forecasting was most accurate, predicting ~40MM vehicles will pass through LAX in 2017
 
 ```{r message=FALSE, warning=FALSE, cache=FALSE, echo=FALSE}
 knitr::read_chunk("../code/main.R")
@@ -98,50 +98,73 @@ Our Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test shows no statistical significa
 ```{r kpss, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-# STL Decomposition
+# Model Selection
 
-## Analysis
+We'll run forecasting using our three models:
+
+* STL Decomposition  
+* Holt-Winters Exponential Smoothing  
+* Arima  
+
+## STL Decomposition
+
+### Analysis
 
 ```{r stl_analysis, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-## Validation
+### Validation
 
 ```{r stl_validation, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-# Holt-Winters Exponential Smoothing
+## Holt-Winters Exponential Smoothing
 
-## Analysis
+### Analysis
 
 ```{r hw_analysis, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-## Validation
+### Validation
 
 ```{r hw_validation, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-# Arima
+## Arima
 
-## Analysis
+### Analysis
 
 ```{r arima_analysis, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-## Validation
+### Validation
 
 ```{r arima_validation, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-# Model Select
+## Model Comparison
 
-Our STL Decomposition forecast performed the best, so we'll go ahead and use this model to project LAX ground vehicles 2 years out
+We compared our models using the following error metrics:  
+* Mean Absolute Error  
+* Mean Absolute Percentage Error  
+* Mean Squared Error    
+* Mean Percentage Error  
+
+```{r model_comparison, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+Our STL Decomposition model performed the best
+
+# Forecasting
+
+We'll use our STL Decomposition to project LAX ground vehicles 2 years out
 
 ```{r final_forecast, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-# Data Quality Check
+# Appendix
+
+## Data Quality Check
 
 ```{r data_sanity_check_1, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
@@ -152,7 +175,7 @@ We see three odd things about our data, and will do what we can to fix them:
 2.  Month of 2014-09 is the only month where entries out pace exists
 3.  Exits outpace entries every month
 
-## Part 1
+### Part 1
 
 Month of 2014-04 has an unusual spike in trip volume.
 
@@ -164,7 +187,7 @@ Investigating our raw data shows dup rows for this month, so we'll go ahead and 
 ```{r data_sanity_check_3, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-## Part 2
+### Part 2
 
 We see month of 2014-09 is the only month where entries out pace exists.
 
@@ -173,7 +196,7 @@ We'll correct for this by editing exits for that month to be the "# of entries i
 ```{r data_sanity_check_4, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-## Part 3
+### Part 3
 
 Lastly, exits outpace entries every month. In reality, a vehicle that exits had to have entered at some point, and vice versa. 
 
@@ -182,7 +205,7 @@ For our analysis, we only need one number per month, so we'll use the maximum of
 ```{r data_sanity_check_5, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-# Code
+## Code
 ```{r setup, message=FALSE, warning=FALSE, eval=FALSE}
 ```
 ```{r functions, message=FALSE, warning=FALSE, eval=FALSE}

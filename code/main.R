@@ -361,14 +361,14 @@ arima_validation %>%
 forecast_validation<-forecast_validation %>%
   bind_rows(arima_validation)
 
-## @knitr final_forecast
+## @knitr model_comparison
 forecast_validation %>%
   get_table()
 
+## @knitr final_forecast
 lax.fcast<-data.frame(forecast.stl(lax.stl, h=24+validation_periods, method="ets"))
 lax.fcast %>%
   get_table()
-
 
 lax_forecasted<-data.frame(reporting_month=strptime(gsub(" ", "-", paste("01", row.names(lax.fcast), sep="-")), format="%d-%b-%Y"),
                               metric="predicted",
@@ -377,10 +377,10 @@ lax_forecasted %>%
   dplyr::select(-metric) %>%
   get_table()
 
-lax_forecasted %>%
-  filter(year(reporting_month)=="2017") %>%
-  group_by(year(reporting_month)) %>%
-  summarize(vehicles=sum(value))
+# lax_forecasted %>%
+#   filter(year(reporting_month)=="2017") %>%
+#   group_by(year(reporting_month)) %>%
+#   summarize(vehicles=sum(value))
 
 lax_ground_vehicle_traffic_volume_cleaned %>%
   dplyr::rename(actuals=vehicles) %>%
