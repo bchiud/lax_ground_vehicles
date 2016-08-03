@@ -84,11 +84,59 @@ For our analysis, we only need one number per month, so we'll use the maximum of
 ```{r data_sanity_check_5, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
-## Data Setup
+# Data Setup
 
-To setup our data, we'll take the last 6 weeks and set them aside for validation. We'll use the remaining data to train our models.
+To setup our data, we'll take the last `r validation_periods` weeks and set them aside for validation. We'll use the remaining data to train our models.
 
 ```{r data_setup, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+We see relatively strong 12 month seasonality:
+
+* February is consistently the lowest month  
+* July / August / December are consistently the highest months  
+* Dips consistently occur during September / October / November periods  
+
+```{r exploring_patterns, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+Before proceeding, we'll need to make our data stationary over time, so we'll start with an integrated order of 1 and see if it's statinoary.
+
+```{r diff1, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+Our Autocorrelation Function (ACF) shows significance at lag 12 and almost significance at lag 24. This makes intuitive sense as travel data is seasonal on an annual level.
+
+```{r acf, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+Our Augmented Dickey-Fuller (ADF) test shows statistical significance ( p<0.05 ) when integrated at order 1, so our data is now stationary and we'll proceed.
+
+```{r adf, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+# STL Decomposition
+
+```{r stl_analysis, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+```{r stl_validation, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+# Holt-Winters Exponential Smoothing
+
+```{r hw_analysis, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+```{r hw_validation, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+# Auto Arima
+
+```{r auto_arima_analysis, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```
+
+```{r auto_arima_validation, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
 ```
 
 # Code
@@ -111,4 +159,12 @@ To setup our data, we'll take the last 6 weeks and set them aside for validation
 ```{r data_sanity_check_5, message=FALSE, warning=FALSE, eval=FALSE}
 ```
 ```{r data_setup, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r exploring_patters, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r diff1, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r acf, message=FALSE, warning=FALSE, eval=FALSE}
+```
+```{r adf, message=FALSE, warning=FALSE, eval=FALSE}
 ```

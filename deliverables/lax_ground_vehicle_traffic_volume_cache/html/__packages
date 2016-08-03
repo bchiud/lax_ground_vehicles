@@ -9,3 +9,4 @@ knitr
 lubridate
 stringr
 tidyr
+tseries
