@@ -165,6 +165,10 @@ We'll use our STL Decomposition to project LAX ground vehicles 2 years out
 
 # Appendix
 
+## Data Source
+
+Our raw data for LAX Ground Vehicle Traffic Volume came from www.data.gov. See [here](https://catalog.data.gov/dataset/los-angeles-international-airport-ground-vehicle-traffic-volume-cb231) for the original data source.
+
 ## Data Quality Check
 
 ```{r data_sanity_check_1, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
