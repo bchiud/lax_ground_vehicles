@@ -3,14 +3,16 @@ title: "LAX Ground Vehicle Traffic Volume Forecasting"
 author: "Brady Chiu"
 date: "August 07, 2016"
 output:
-  pdf_document:
-    number_sections: yes
-    toc: yes
-    toc_depth: 4
   html_document:
     css: ./formatting.css
-    number_sections: yes
-    toc: yes
+    code_folding: hide
+    number_sections: true
+    toc: true
+    toc_float: true
+    toc_depth: 4
+  pdf_document:
+    number_sections: true
+    toc: true
     toc_depth: 4
 ---
 
@@ -20,27 +22,29 @@ output:
 * __Apporach:__ We assessed 3 forecasting models: STL Decomposition, Holt-Winters Exponential Smoothing, and Arima  
 * __Finding:__ STL Decomposition forecasting was most accurate, predicting ~40MM vehicles will pass through LAX in 2017
 
-```{r message=FALSE, warning=FALSE, cache=FALSE, echo=FALSE}
+```{r message=FALSE, warning=FALSE}
 knitr::read_chunk("../code/main.R")
 knitr::opts_chunk$set(fig.height=5, fig.width=8)
 ```
-```{r setup, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```{r notes, message=FALSE, warning=FALSE}
 ```
-```{r functions, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```{r setup, message=FALSE, warning=FALSE, cache=TRUE}
 ```
-```{r parameters, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```{r functions, message=FALSE, warning=FALSE, cache=TRUE}
 ```
-```{r data, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```{r parameters, message=FALSE, warning=FALSE, cache=TRUE}
 ```
-```{r data_sanity_check_1, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```{r data, message=FALSE, warning=FALSE, cache=TRUE}
 ```
-```{r data_sanity_check_2, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```{r data_sanity_check_1, message=FALSE, warning=FALSE, cache=TRUE, include=FALSE}
 ```
-```{r data_sanity_check_3, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```{r data_sanity_check_2, message=FALSE, warning=FALSE, cache=TRUE, include=FALSE}
 ```
-```{r data_sanity_check_4, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```{r data_sanity_check_3, message=FALSE, warning=FALSE, cache=TRUE, include=FALSE}
 ```
-```{r data_sanity_check_5, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE, include=FALSE}
+```{r data_sanity_check_4, message=FALSE, warning=FALSE, cache=TRUE, include=FALSE}
+```
+```{r data_sanity_check_5, message=FALSE, warning=FALSE, cache=TRUE, include=FALSE}
 ```
 
 # Setup
@@ -49,7 +53,7 @@ knitr::opts_chunk$set(fig.height=5, fig.width=8)
 
 To setup the data for our analysis, we'll take the last `r validation_periods` months and set them aside for validation. We'll use the remaining data to train our models.
 
-```{r data_setup, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r data_setup, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ## Exploring Patterns
@@ -60,42 +64,42 @@ As expected with travel patterns, we see relatively strong 12 month seasonality:
 * July / August / December are consistently the highest months  
 * Dips consistently occur during September / October / November periods  
 
-```{r exploring_patterns, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r exploring_patterns, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ## Stationary
 
 Before proceeding, we'll need to make our data stationary over time, so we'll start with an integrated of order 1 and see if it becomes stationary.
 
-```{r diff1, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r diff1, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ### ACF
 
 Our Autocorrelation Function (ACF) shows significance at lag 12 and almost significance at lag 24. This makes intuitive sense as travel data is seasonal on an annual level.
 
-```{r acf, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r acf, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ### Ljung-Box
 
 Our Ljung-Box test shows statistical significance, validating I(1) is stationary.
 
-```{r ljung-box, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r ljung-box, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ### ADF
 
 Our Augmented Dickey-Fuller (ADF) test shows statistical significance at a p-value < 0.05, validating I(1) is stationary.
 
-```{r adf, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r adf, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ### KPSS
 
 Our Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test shows no statistical significance at a p-value < 0.05, validating I(1) is stationary.
 
-```{r kpss, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r kpss, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 # Model Selection
@@ -110,36 +114,36 @@ We'll run forecasting using our three models:
 
 ### Analysis
 
-```{r stl_analysis, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r stl_analysis, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ### Validation
 
-```{r stl_validation, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r stl_validation, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ## Holt-Winters Exponential Smoothing
 
 ### Analysis
 
-```{r hw_analysis, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r hw_analysis, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ### Validation
 
-```{r hw_validation, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r hw_validation, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ## Arima
 
 ### Analysis
 
-```{r arima_analysis, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r arima_analysis, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ### Validation
 
-```{r arima_validation, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r arima_validation, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ## Model Comparison
@@ -151,7 +155,7 @@ We compared our models using the following error metrics:
 * Mean Squared Error    
 * Mean Percentage Error  
 
-```{r model_comparison, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r model_comparison, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 Our STL Decomposition model performed the best
@@ -160,7 +164,7 @@ Our STL Decomposition model performed the best
 
 We'll use our STL Decomposition to project LAX ground vehicles 2 years out
 
-```{r final_forecast, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r final_forecast, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 # Appendix
@@ -171,7 +175,7 @@ Our raw data for LAX Ground Vehicle Traffic Volume came from www.data.gov. See [
 
 ## Data Quality Check
 
-```{r data_sanity_check_1, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r data_sanity_check_1, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 We see three odd things about our data, and will do what we can to fix them:
@@ -184,12 +188,12 @@ We see three odd things about our data, and will do what we can to fix them:
 
 Month of 2014-04 has an unusual spike in trip volume.
 
-```{r data_sanity_check_2, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r data_sanity_check_2, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 Investigating our raw data shows dup rows for this month, so we'll go ahead and dedup rows for that month.
 
-```{r data_sanity_check_3, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r data_sanity_check_3, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ### Part 2
@@ -198,7 +202,7 @@ We see month of 2014-09 is the only month where entries out pace exists.
 
 We'll correct for this by editing exits for that month to be the "# of entries in 2014-09" + "average difference between exits and entries".
 
-```{r data_sanity_check_4, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
+```{r data_sanity_check_4, message=FALSE, warning=FALSE, cache=TRUE}
 ```
 
 ### Part 3
@@ -207,53 +211,5 @@ Lastly, exits outpace entries every month. In reality, a vehicle that exits had 
 
 For our analysis, we only need one number per month, so we'll use the maximum of each months entry or exit.
 
-```{r data_sanity_check_5, message=FALSE, warning=FALSE, cache=TRUE, echo=FALSE}
-```
-
-## Code
-```{r setup, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r functions, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r parameters, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r data, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r data_sanity_check_1, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r data_sanity_check_2, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r data_sanity_check_3, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r data_sanity_check_4, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r data_sanity_check_5, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r data_setup, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r exploring_patters, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r diff1, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r acf, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r ljung-box, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r adf, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r kpss, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r create_ts, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r stl_analysis, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r stl_validation, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r hw_analysis, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r hw_validation, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r arima_analysis, message=FALSE, warning=FALSE, eval=FALSE}
-```
-```{r arima_validation, message=FALSE, warning=FALSE, eval=FALSE}
+```{r data_sanity_check_5, message=FALSE, warning=FALSE, cache=TRUE}
 ```
