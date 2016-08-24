@@ -4,6 +4,8 @@
 # Date: July 29, 2016
 #======================================================================
 ## @knitr notes
+# todo:
+# 1) redo analysis with repeated k-folds cross validation, given the small sample size
 
 ## @knitr setup
 work_dir="/Users/bradychiu/Dropbox/r/lax_ground_vehicle_traffic_volume"
